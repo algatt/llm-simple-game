@@ -11,4 +11,8 @@ export class ScoreSystem {
   getScore() {
     return Math.floor(this.score);
   }
+
+  reset() {
+    this.score = 0;
+  }
 }

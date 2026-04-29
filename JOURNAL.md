@@ -186,3 +186,12 @@
 ### Progress Update: Collision Speed Penalty
 - Colliding with scenery now stops the player immediately by setting speed to `0`.
 - Player speed now supports a true stopped state so crashes do not rebound back to speed `1` on the next frame.
+
+### Progress Update: Gameplay Feel Polish
+- Added off-road friction: leaving the road now gradually reduces speed even before collision.
+- Added a subtle red off-road warning overlay that strengthens with speed.
+- Added crash feedback: screen shake, white flash, player wobble, and health HUD pulse.
+- Added pedaling legs and a player shadow for stronger motion and grounding.
+- Tuned scenery depth so close roadside objects can pass in front of the player while distant objects stay behind.
+- Added restart support on game over with `R`.
+- Game over now stores and displays best score using local storage when available.

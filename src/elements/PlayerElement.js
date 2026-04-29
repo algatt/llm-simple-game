@@ -15,6 +15,8 @@ export class PlayerElement {
     this.body = null;
     this.hitbox = null;
     this.wheels = [];
+    this.legs = [];
+    this.shadow = null;
     this.keys = null;
     this.bounds = null;
   }
@@ -57,15 +59,44 @@ export class PlayerElement {
     this.speed = Phaser.Math.Clamp(nextSpeed, this.minSpeed, this.maxSpeed);
     this.body.x = Phaser.Math.Clamp(nextX, minX, maxX);
     this.body.rotation = Phaser.Math.Linear(this.body.rotation, direction * 0.16, 0.18);
+    this.body.y = this.bounds.y + this.bounds.height - 70 + Math.sin(this.body.scene.time.now * 0.018) * this.speed * 0.12;
     this.wheels.forEach((wheel) => {
       wheel.y = Math.sin(this.speed * this.body.scene.time.now * 0.008) * 1.4;
     });
+    this.animatePedals(dt);
 
     this.hitbox.setPosition(this.body.x, this.body.y - 18);
+    this.shadow.setPosition(this.body.x, this.body.y + 8);
+    this.shadow.width = 52 + this.speed * 1.4;
+  }
+
+  applyOffRoadFriction(delta, amount = 1.6) {
+    this.speed = Phaser.Math.Clamp(
+      this.speed - amount * (delta / 1000),
+      this.minSpeed,
+      this.maxSpeed
+    );
+  }
+
+  wobble() {
+    if (!this.body) {
+      return;
+    }
+
+    this.body.scene.tweens.add({
+      targets: this.body,
+      x: this.body.x + Phaser.Math.Between(-18, 18),
+      angle: Phaser.Math.Between(-12, 12),
+      duration: 90,
+      yoyo: true,
+      ease: 'Sine.easeOut'
+    });
   }
 
   createBikeVisual(scene) {
     const rearWheel = this.createRearWheel(scene, 0, 0);
+    this.shadow = scene.add.ellipse(this.body.x, this.body.y + 8, 58, 16, 0x000000, 0.22);
+    this.shadow.setDepth(8);
     const frame = scene.add.graphics();
 
     frame.lineStyle(4, this.color, 1);
@@ -93,11 +124,20 @@ export class PlayerElement {
       .setOrigin(0, 0)
       .setLineWidth(5);
     const seat = scene.add.ellipse(0, -34, 22, 8, 0x1e293b);
+    const leftLeg = scene.add.line(0, 0, -8, -38, -14, -16, 0x1e293b)
+      .setOrigin(0, 0)
+      .setLineWidth(5);
+    const rightLeg = scene.add.line(0, 0, 8, -38, 14, -16, 0x1e293b)
+      .setOrigin(0, 0)
+      .setLineWidth(5);
 
     this.wheels = [rearWheel];
+    this.legs = [leftLeg, rightLeg];
     this.body.add([
       rearWheel,
       frame,
+      leftLeg,
+      rightLeg,
       leftArm,
       rightArm,
       torso,
@@ -122,6 +162,19 @@ export class PlayerElement {
 
     wheel.add([tire, rim, treadTop, treadBottom, hub]);
     return wheel;
+  }
+
+  animatePedals(dt) {
+    const phase = this.body.scene.time.now * 0.012 * Math.max(0.2, this.speed);
+    const swing = Math.sin(phase) * 9;
+
+    if (this.legs[0]) {
+      this.legs[0].setTo(-8, -38, -14 - swing * 0.2, -16 + swing);
+    }
+
+    if (this.legs[1]) {
+      this.legs[1].setTo(8, -38, 14 + swing * 0.2, -16 - swing);
+    }
   }
 
   getSpeed() {
@@ -154,9 +207,12 @@ export class PlayerElement {
   destroy() {
     this.body?.destroy();
     this.hitbox?.destroy();
+    this.shadow?.destroy();
     this.body = null;
     this.hitbox = null;
     this.wheels = [];
+    this.legs = [];
+    this.shadow = null;
     this.keys = null;
     this.bounds = null;
   }

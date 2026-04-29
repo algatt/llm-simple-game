@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { FeedbackOverlayElement } from "../elements/FeedbackOverlayElement.js";
 import { GameOverElement } from "../elements/GameOverElement.js";
 import { HealthHudElement } from "../elements/HealthHudElement.js";
 import { PlayerElement } from "../elements/PlayerElement.js";
@@ -22,14 +23,21 @@ export class GameScene extends Phaser.Scene {
     this.healthHud = null;
     this.healthSystem = new HealthSystem();
     this.scoreSystem = new ScoreSystem();
+    this.feedbackOverlay = null;
     this.gameOverElement = null;
     this.isGameOver = false;
+    this.restartKey = null;
     this.terrain = null;
   }
 
   create() {
     const { width, height } = this.scale;
     const horizonY = height / 2;
+
+    this.healthSystem = new HealthSystem();
+    this.scoreSystem = new ScoreSystem();
+    this.isGameOver = false;
+    this.restartKey = this.input.keyboard.addKey("R");
 
     const sky = new SkyElement();
     sky.create(this, {
@@ -105,15 +113,31 @@ export class GameScene extends Phaser.Scene {
     });
     this.healthHud.update(this.healthSystem.getHealth());
 
+    this.feedbackOverlay = new FeedbackOverlayElement();
+    this.feedbackOverlay.create(this, {
+      width,
+      height,
+    });
+
     this.worldElements = [sky, terrain];
   }
 
   update(time, delta) {
     if (this.isGameOver) {
+      if (Phaser.Input.Keyboard.JustDown(this.restartKey)) {
+        this.scene.restart();
+      }
+
       return;
     }
 
     this.player?.update(delta);
+    const isOffRoad = this.isPlayerOffRoad();
+
+    if (isOffRoad) {
+      this.player?.applyOffRoadFriction(delta, 1.8);
+    }
+
     const speed = this.player?.getSpeed() ?? 0;
 
     this.scoreSystem.update(delta, speed);
@@ -124,10 +148,22 @@ export class GameScene extends Phaser.Scene {
     this.scoreHud?.update(this.scoreSystem.getScore());
     this.checkSceneryCollisions(speed);
     this.healthHud?.update(this.healthSystem.getHealth());
+    this.feedbackOverlay?.update(isOffRoad, speed);
 
     if (this.healthSystem.isDepleted()) {
       this.endGame();
     }
+  }
+
+  isPlayerOffRoad() {
+    const playerPosition = this.player?.getPosition();
+    const road = this.terrain?.getRoad();
+
+    if (!playerPosition || !road) {
+      return false;
+    }
+
+    return !road.isPointOnRoad(playerPosition.x, playerPosition.y);
   }
 
   checkSceneryCollisions(speed) {
@@ -153,17 +189,38 @@ export class GameScene extends Phaser.Scene {
 
       this.healthSystem.applyDamage(damage);
       this.player?.crashStop();
+      this.player?.wobble();
+      this.healthHud?.pulse();
+      this.feedbackOverlay?.crashFlash();
+      this.cameras.main.shake(170, 0.012);
       scenery.markCollided(item);
     });
   }
 
   endGame() {
     this.isGameOver = true;
+    const score = this.scoreSystem.getScore();
+    const bestScore = this.saveBestScore(score);
+
     this.gameOverElement = new GameOverElement();
     this.gameOverElement.create(this, {
       width: this.scale.width,
       height: this.scale.height,
-    }, this.scoreSystem.getScore());
+    }, score, bestScore);
+  }
+
+  saveBestScore(score) {
+    const storageKey = "robert-game-best-score";
+
+    try {
+      const previousBest = Number(window.localStorage.getItem(storageKey) ?? 0);
+      const bestScore = Math.max(previousBest, score);
+
+      window.localStorage.setItem(storageKey, String(bestScore));
+      return bestScore;
+    } catch {
+      return score;
+    }
   }
 
   shutdown() {
@@ -177,8 +234,11 @@ export class GameScene extends Phaser.Scene {
     this.scoreHud = null;
     this.healthHud?.destroy();
     this.healthHud = null;
+    this.feedbackOverlay?.destroy();
+    this.feedbackOverlay = null;
     this.gameOverElement?.destroy();
     this.gameOverElement = null;
+    this.restartKey = null;
     this.terrain = null;
   }
 }

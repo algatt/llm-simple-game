@@ -81,7 +81,7 @@ export class SceneryGenerator {
     item.container.setPosition(x, y);
     item.container.setScale(scale);
     item.container.setAlpha(1);
-    item.container.setDepth(4 + y / 1000);
+    item.container.setDepth(2 + y / 55);
   }
 
   removePassedItems() {

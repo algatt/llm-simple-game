@@ -5,6 +5,7 @@ export class HealthHudElement {
     this.text = null;
     this.bar = null;
     this.fill = null;
+    this.pulseFrames = 0;
   }
 
   create(scene, bounds) {
@@ -34,6 +35,20 @@ export class HealthHudElement {
       this.fill.width = 124 * ratio;
       this.fill.setFillStyle(ratio > 0.45 ? 0x4ade80 : 0xef4444);
     }
+
+    if (this.pulseFrames > 0) {
+      this.pulseFrames -= 1;
+      this.text?.setColor('#ef4444');
+      this.fill?.setScale(1, 1.4);
+      return;
+    }
+
+    this.text?.setColor('#f5f7fb');
+    this.fill?.setScale(1, 1);
+  }
+
+  pulse() {
+    this.pulseFrames = 12;
   }
 
   destroy() {

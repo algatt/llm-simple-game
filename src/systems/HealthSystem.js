@@ -17,6 +17,10 @@ export class HealthSystem {
     return this.health;
   }
 
+  reset() {
+    this.health = this.maxHealth;
+  }
+
   getHealth() {
     return this.health;
   }
