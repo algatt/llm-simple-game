@@ -25,3 +25,13 @@ I want the curve to be worked out differently, right now when i set curveX the r
 ### Prompt 7
 ok much better. now let's start planning the player before we continue to work on the road. for now the player can be a cube. and make this cube move left and right using a and d
 
+### Prompt 8
+
+ok, now let's add the player speed. add an indicator on the top of the screen with speed. when 'w' is pressed speed increases, and when 's' is pressed speed decreases. make sure not to go beyond limits. when speed increases / decreeases i want the road the user to move on the road. so we must create a roadgenerator module, that generates the road in a random manner, but obviously making sure that the road is continuous and behaves in a natural way.
+
+### Prompt 9
+Looking good, but the road behaves unnaturally it is twisting too much we need a more natural flow like actual streets. also limit the speed from 1 to 10.
+
+### Prompt 10
+
+Ok i need longer straights, and more sharp turns when they happen. This contributes to the game since later on if the user will go off road we will deduct health.

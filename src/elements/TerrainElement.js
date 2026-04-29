@@ -30,6 +30,10 @@ export class TerrainElement {
     this.objects = [ground, horizon, grassLine, this.road];
   }
 
+  update(delta, speed) {
+    this.road.update(delta, speed);
+  }
+
   destroy() {
     this.objects.forEach((object) => object.destroy());
     this.objects = [];

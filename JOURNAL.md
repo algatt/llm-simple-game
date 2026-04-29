@@ -83,3 +83,32 @@
 - The first player is a simple cube placed near the bottom center of the terrain.
 - Added keyboard movement with `A` for left and `D` for right.
 - Kept movement inside the player element so the cube can later become a bicycle without crowding `GameScene`.
+
+### Progress Update: Speed and Road Generation
+- Added player forward speed with `W` to accelerate and `S` to brake.
+- Speed is clamped between configured minimum and maximum values.
+- Added `SpeedHudElement` to show current speed at the top of the screen.
+- Added `RoadGenerator`, which creates continuous random road offsets from spaced anchor points and smooth interpolation.
+- Reworked `RoadElement` so the road advances through generated road data based on player speed, making the player feel like they are moving forward on an endless road.
+
+### Progress Update: Natural Road Flow
+- Changed player speed to a gameplay scale from `1` to `10`.
+- Added an internal road movement multiplier so displayed speed stays readable while the world still scrolls convincingly.
+- Tuned `RoadGenerator` for more natural streets:
+  - longer spacing between curve anchors,
+  - smaller offset changes,
+  - a slight bias back toward the center,
+  - less far-future road sampled on screen.
+- Increased road curve easing so bends feel gradual instead of twisty.
+
+### Progress Update: Straights and Meaningful Turns
+- Changed `RoadGenerator` from constant wandering to section-based road planning.
+- Most generated sections are straights with only tiny jitter and a stronger pull back toward center.
+- Occasional turn sections now move the road more decisively left or right for one or two anchors.
+- This should support the future health system better: long straights let the player recover, while sharper turns create moments where going off-road can matter.
+
+### Progress Update: Section Length Road Planning
+- Replaced evenly spaced road anchors with variable road sections.
+- Straights now hold almost the same offset for a long distance.
+- Turns now happen over a much shorter distance and move by a larger amount.
+- The generator alternates between long straight holds and short turn transitions, which should read more like actual roads than left/right drifting.
