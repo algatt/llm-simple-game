@@ -152,6 +152,7 @@ export class GameScene extends Phaser.Scene {
       const damage = this.healthSystem.damageForSpeed(speed);
 
       this.healthSystem.applyDamage(damage);
+      this.player?.crashStop();
       scenery.markCollided(item);
     });
   }

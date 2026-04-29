@@ -161,3 +161,28 @@
 - Added `ScoreHudElement` to display current points at the top-left of the screen.
 - Added `GameOverElement` overlay with final points.
 - `GameScene` now ends the run when health reaches zero and stops updating player/world progression.
+
+### Progress Update: Player Bicycle Visual
+- Replaced the placeholder player cube with a shape-built bicycle and rider.
+- Added two wheels, a simple frame, handlebars, and rider body/head.
+- Player now leans slightly left/right while steering.
+- Wheel rotation is tied to current speed.
+- Added an invisible hitbox so collision behavior stays controlled independently from the visual art.
+
+### Progress Update: Rear-View Cyclist
+- Reworked the player bicycle from a side-view bike into a rear-view cyclist to match the road perspective.
+- The rider now has a rear wheel, centered frame, shoulders, arms, head, helmet, and handlebars viewed from behind.
+- Kept the same movement and collision API.
+
+### Progress Update: Rear Wheel Correction
+- Changed the bicycle wheel from a side-view circle/ellipse to a narrow rear-view tire.
+- Removed screen-plane wheel rotation and replaced it with subtle motion on the rear tire so it fits the back-view perspective.
+
+### Progress Update: Road Steering Correction
+- Removed road auto-centering from `RoadElement`.
+- The generated road offset now affects the road at the player's position, so bends move the road left/right under the cyclist.
+- The player must steer to follow bends instead of passively staying aligned with the street.
+
+### Progress Update: Collision Speed Penalty
+- Colliding with scenery now stops the player immediately by setting speed to `0`.
+- Player speed now supports a true stopped state so crashes do not rebound back to speed `1` on the next frame.

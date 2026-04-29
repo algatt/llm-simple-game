@@ -56,8 +56,7 @@ export class RoadElement {
     const perspective = 1 - progress ** 1.45;
     const bottomCenterX = this.bounds.x + this.bounds.width / 2;
     const bottomY = this.bounds.y + this.bounds.height;
-    const baseOffset = this.generator.getOffset(this.distance);
-    const centerX = bottomCenterX + this.generator.getOffset(distance) - baseOffset;
+    const centerX = bottomCenterX + this.generator.getOffset(distance);
     const y = bottomY - this.bounds.height * progress;
     const width = this.topWidth + (this.bottomWidth - this.topWidth) * perspective;
 
@@ -83,8 +82,7 @@ export class RoadElement {
     const roadDistance = this.distance + this.lookAhead * this.easeCurve(progress);
     const perspective = 1 - progress ** 1.45;
     const bottomCenterX = this.bounds.x + this.bounds.width / 2;
-    const baseOffset = this.generator.getOffset(this.distance);
-    const centerX = bottomCenterX + this.generator.getOffset(roadDistance) - baseOffset;
+    const centerX = bottomCenterX + this.generator.getOffset(roadDistance);
     const width = this.topWidth + (this.bottomWidth - this.topWidth) * perspective;
 
     return {
@@ -126,14 +124,13 @@ export class RoadElement {
     const centerLine = [];
     const bottomCenterX = bounds.x + bounds.width / 2;
     const bottomY = bounds.y + bounds.height;
-    const baseOffset = this.generator.getOffset(this.distance);
 
     for (let index = 0; index <= this.segments; index += 1) {
       const progress = index / this.segments;
       const perspective = 1 - progress ** 1.45;
       const y = bottomY - bounds.height * progress;
       const roadDistance = this.distance + this.lookAhead * this.easeCurve(progress);
-      const centerX = bottomCenterX + this.generator.getOffset(roadDistance) - baseOffset;
+      const centerX = bottomCenterX + this.generator.getOffset(roadDistance);
       const width = this.topWidth + (this.bottomWidth - this.topWidth) * perspective;
 
       leftEdge.push({ x: centerX - width / 2, y, progress });

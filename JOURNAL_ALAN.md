@@ -69,3 +69,18 @@ now let's add health, same bar 1 to 10, and if the player gets off the street an
 
 ### Prompt 19
 ok. now let's add a points system. it increments depending on the road covered determined by speed. if the health reaches 0 game over
+
+### Prompt 20
+
+what do you tink about the player, can we make it nicer?
+
+### Prompt 21
+the bicycle is being viewed from the side but we should see him from the back
+
+### Prompt 22
+since we're looking from the back the wheel should be looking from the back as well, not a circle!
+
+### Prompt 23
+
+I noticed that if the street bends and i do not touch controls the bicycle goes along with the direction of the street this should not happen.
+
