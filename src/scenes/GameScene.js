@@ -1,10 +1,15 @@
 import Phaser from "phaser";
+import { GameOverElement } from "../elements/GameOverElement.js";
+import { HealthHudElement } from "../elements/HealthHudElement.js";
 import { PlayerElement } from "../elements/PlayerElement.js";
 import { RoadElement } from "../elements/RoadElement.js";
+import { ScoreHudElement } from "../elements/ScoreHudElement.js";
 import { SkyElement } from "../elements/SkyElement.js";
 import { SpeedHudElement } from "../elements/SpeedHudElement.js";
 import { TerrainElement } from "../elements/TerrainElement.js";
+import { HealthSystem } from "../systems/HealthSystem.js";
 import { RoadGenerator } from "../systems/RoadGenerator.js";
+import { ScoreSystem } from "../systems/ScoreSystem.js";
 import { SceneryGenerator } from "../systems/SceneryGenerator.js";
 
 export class GameScene extends Phaser.Scene {
@@ -13,6 +18,13 @@ export class GameScene extends Phaser.Scene {
     this.worldElements = [];
     this.player = null;
     this.speedHud = null;
+    this.scoreHud = null;
+    this.healthHud = null;
+    this.healthSystem = new HealthSystem();
+    this.scoreSystem = new ScoreSystem();
+    this.gameOverElement = null;
+    this.isGameOver = false;
+    this.terrain = null;
   }
 
   create() {
@@ -50,6 +62,7 @@ export class GameScene extends Phaser.Scene {
       houseDistance: 980,
     });
     const terrain = new TerrainElement({ road, scenery });
+    this.terrain = terrain;
     terrain.create(this, {
       x: 0,
       y: horizonY,
@@ -74,17 +87,82 @@ export class GameScene extends Phaser.Scene {
     });
     this.speedHud.update(this.player.getSpeed());
 
+    this.scoreHud = new ScoreHudElement();
+    this.scoreHud.create(this, {
+      x: 0,
+      y: 0,
+      width,
+      height: horizonY,
+    });
+    this.scoreHud.update(this.scoreSystem.getScore());
+
+    this.healthHud = new HealthHudElement();
+    this.healthHud.create(this, {
+      x: 0,
+      y: 0,
+      width,
+      height: horizonY,
+    });
+    this.healthHud.update(this.healthSystem.getHealth());
+
     this.worldElements = [sky, terrain];
   }
 
   update(time, delta) {
+    if (this.isGameOver) {
+      return;
+    }
+
     this.player?.update(delta);
     const speed = this.player?.getSpeed() ?? 0;
 
+    this.scoreSystem.update(delta, speed);
     this.worldElements.forEach((element) => {
       element.update?.(delta, speed);
     });
     this.speedHud?.update(speed);
+    this.scoreHud?.update(this.scoreSystem.getScore());
+    this.checkSceneryCollisions(speed);
+    this.healthHud?.update(this.healthSystem.getHealth());
+
+    if (this.healthSystem.isDepleted()) {
+      this.endGame();
+    }
+  }
+
+  checkSceneryCollisions(speed) {
+    const playerPosition = this.player?.getPosition();
+    const playerBounds = this.player?.getBounds();
+    const road = this.terrain?.getRoad();
+    const scenery = this.terrain?.getScenery();
+
+    if (!playerPosition || !playerBounds || !road || !scenery) {
+      return;
+    }
+
+    if (road.isPointOnRoad(playerPosition.x, playerPosition.y)) {
+      return;
+    }
+
+    scenery.getCollisionItems().forEach(({ item, bounds }) => {
+      if (!Phaser.Geom.Intersects.RectangleToRectangle(playerBounds, bounds)) {
+        return;
+      }
+
+      const damage = this.healthSystem.damageForSpeed(speed);
+
+      this.healthSystem.applyDamage(damage);
+      scenery.markCollided(item);
+    });
+  }
+
+  endGame() {
+    this.isGameOver = true;
+    this.gameOverElement = new GameOverElement();
+    this.gameOverElement.create(this, {
+      width: this.scale.width,
+      height: this.scale.height,
+    }, this.scoreSystem.getScore());
   }
 
   shutdown() {
@@ -94,5 +172,12 @@ export class GameScene extends Phaser.Scene {
     this.player = null;
     this.speedHud?.destroy();
     this.speedHud = null;
+    this.scoreHud?.destroy();
+    this.scoreHud = null;
+    this.healthHud?.destroy();
+    this.healthHud = null;
+    this.gameOverElement?.destroy();
+    this.gameOverElement = null;
+    this.terrain = null;
   }
 }

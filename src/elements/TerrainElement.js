@@ -38,6 +38,14 @@ export class TerrainElement {
     this.scenery.update(delta, speed);
   }
 
+  getRoad() {
+    return this.road;
+  }
+
+  getScenery() {
+    return this.scenery;
+  }
+
   destroy() {
     this.objects.forEach((object) => object.destroy());
     this.objects = [];

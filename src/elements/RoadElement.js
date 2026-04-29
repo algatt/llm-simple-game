@@ -70,6 +70,42 @@ export class RoadElement {
     };
   }
 
+  getSampleAtY(y) {
+    if (!this.bounds) {
+      return null;
+    }
+
+    const progress = Phaser.Math.Clamp(
+      (this.bounds.y + this.bounds.height - y) / this.bounds.height,
+      0,
+      1
+    );
+    const roadDistance = this.distance + this.lookAhead * this.easeCurve(progress);
+    const perspective = 1 - progress ** 1.45;
+    const bottomCenterX = this.bounds.x + this.bounds.width / 2;
+    const baseOffset = this.generator.getOffset(this.distance);
+    const centerX = bottomCenterX + this.generator.getOffset(roadDistance) - baseOffset;
+    const width = this.topWidth + (this.bottomWidth - this.topWidth) * perspective;
+
+    return {
+      centerX,
+      width,
+      left: centerX - width / 2,
+      right: centerX + width / 2,
+      progress
+    };
+  }
+
+  isPointOnRoad(x, y) {
+    const sample = this.getSampleAtY(y);
+
+    if (!sample) {
+      return false;
+    }
+
+    return x >= sample.left && x <= sample.right;
+  }
+
   draw() {
     if (!this.graphics || !this.bounds) {
       return;

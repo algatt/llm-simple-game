@@ -148,3 +148,16 @@
 - Extended `SceneryGenerator` so it can spawn both houses and trees.
 - Trees have their own random interval and side offset, making them more frequent and usually farther from the road than houses.
 - Trees use the same road perspective sampling as houses, so they scale and move consistently with the endless road.
+
+### Progress Update: Health and Off-Road Collisions
+- Added `HealthSystem` with a 0-10 health pool and speed-based damage calculation.
+- Added `HealthHudElement`, a top-screen health readout and bar.
+- `RoadElement` can now report whether the player is on the road at the player's screen position.
+- `SceneryGenerator` now exposes visible, uncollided scenery bounds for collision checks.
+- The scene now deducts health when the player is off-road and collides with a house or tree, with higher speed causing more damage.
+
+### Progress Update: Points and Game Over
+- Added `ScoreSystem`, which increases points based on speed and elapsed time.
+- Added `ScoreHudElement` to display current points at the top-left of the screen.
+- Added `GameOverElement` overlay with final points.
+- `GameScene` now ends the run when health reaches zero and stops updating player/world progression.

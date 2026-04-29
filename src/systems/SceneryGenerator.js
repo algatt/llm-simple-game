@@ -100,6 +100,19 @@ export class SceneryGenerator {
     this.items = visibleItems;
   }
 
+  getCollisionItems() {
+    return this.items
+      .filter((item) => item.container.visible && !item.hasCollided)
+      .map((item) => ({
+        item,
+        bounds: item.container.getBounds()
+      }));
+  }
+
+  markCollided(item) {
+    item.hasCollided = true;
+  }
+
   createHouseOptions() {
     const types = ['cottage', 'flat'];
     const colors = [0xf1d0a5, 0xe8c7d8, 0xd7e7b8, 0xc9d9f0, 0xf0e0b6];

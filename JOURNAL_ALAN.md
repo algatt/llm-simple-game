@@ -63,3 +63,9 @@ nice. push the houses a bit away from the road
 
 ok now i want the same sort of generator but for trees this time
 
+### Prompt 18
+
+now let's add health, same bar 1 to 10, and if the player gets off the street and collides with a tree or house deduct health depedning on the speed they are going.
+
+### Prompt 19
+ok. now let's add a points system. it increments depending on the road covered determined by speed. if the health reaches 0 game over

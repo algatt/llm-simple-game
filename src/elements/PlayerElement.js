@@ -57,6 +57,21 @@ export class PlayerElement {
     return this.speed;
   }
 
+  getBounds() {
+    return this.body?.getBounds() ?? null;
+  }
+
+  getPosition() {
+    if (!this.body) {
+      return null;
+    }
+
+    return {
+      x: this.body.x,
+      y: this.body.y
+    };
+  }
+
   destroy() {
     this.body?.destroy();
     this.body = null;
