@@ -230,3 +230,7 @@
 - Added `src/vite.config.js` with base path `/llm-simple-game/`.
 - Added `.github/workflows/deploy.yml` to build the Vite app from `src` and deploy `src/dist` to GitHub Pages.
 - Updated `README.md` with GitHub Pages setup instructions.
+
+### Progress Update: GitHub Pages Build Fix
+- Fixed `src/package.json` so `npm run build` runs `vite build` instead of starting the Vite dev server.
+- This allows the GitHub Pages workflow build job to finish and upload the static `dist` artifact.
