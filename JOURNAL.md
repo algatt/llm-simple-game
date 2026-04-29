@@ -57,3 +57,12 @@
 ### Run Notes
 - Install dependencies with `npm install`.
 - Start the browser dev server with `npm run dev`.
+
+### Progress Update: World Split
+- Added a first modular world setup with separate `SkyElement` and `TerrainElement` modules.
+- `GameScene` now composes the world from those elements instead of drawing everything directly in the scene.
+- The screen is split 50/50: sky on the top half, terrain on the bottom half.
+- Removed the temporary Phaser status text and bouncing square so the browser view now shows the beginning of the game world.
+
+### Preference
+- Keep visual world pieces as replaceable modules. A scene should decide which elements exist, while each element owns how it draws and cleans itself up.
