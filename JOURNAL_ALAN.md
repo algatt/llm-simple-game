@@ -101,5 +101,6 @@ ok add them all
 
 can you get some music from public urls and use them instead?
 
+can you find a longer music it's annoying and add a button to mute it
 
 
