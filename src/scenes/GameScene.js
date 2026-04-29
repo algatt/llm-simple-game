@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { PlayerElement } from "../elements/PlayerElement.js";
 import { RoadElement } from "../elements/RoadElement.js";
 import { SkyElement } from "../elements/SkyElement.js";
 import { TerrainElement } from "../elements/TerrainElement.js";
@@ -7,6 +8,7 @@ export class GameScene extends Phaser.Scene {
   constructor() {
     super("GameScene");
     this.worldElements = [];
+    this.player = null;
   }
 
   create() {
@@ -34,11 +36,25 @@ export class GameScene extends Phaser.Scene {
       height: height - horizonY,
     });
 
+    this.player = new PlayerElement();
+    this.player.create(this, {
+      x: 0,
+      y: horizonY,
+      width,
+      height: height - horizonY,
+    });
+
     this.worldElements = [sky, terrain];
+  }
+
+  update(time, delta) {
+    this.player?.update(delta);
   }
 
   shutdown() {
     this.worldElements.forEach((element) => element.destroy());
     this.worldElements = [];
+    this.player?.destroy();
+    this.player = null;
   }
 }

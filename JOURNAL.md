@@ -77,3 +77,9 @@
 - Reworked `RoadElement` so `curveX` creates an actual bend instead of a diagonal road.
 - The road is now generated from multiple sampled points: its centerline eases toward the configured curve amount while the road narrows toward the horizon.
 - Added `segments` and `curveStrength` parameters so future tuning can control road smoothness and bend shape.
+
+### Progress Update: Player Cube
+- Added a modular `PlayerElement`.
+- The first player is a simple cube placed near the bottom center of the terrain.
+- Added keyboard movement with `A` for left and `D` for right.
+- Kept movement inside the player element so the cube can later become a bicycle without crowding `GameScene`.

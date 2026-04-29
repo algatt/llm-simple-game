@@ -21,3 +21,7 @@ ok so the intention is now to have the player ride a bicycle on a road that neve
 ### Prompt 6
 
 I want the curve to be worked out differently, right now when i set curveX the road simply shifts diagonally, i want it to actually curve.
+
+### Prompt 7
+ok much better. now let's start planning the player before we continue to work on the road. for now the player can be a cube. and make this cube move left and right using a and d
+
