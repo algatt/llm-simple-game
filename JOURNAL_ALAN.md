@@ -82,5 +82,7 @@ since we're looking from the back the wheel should be looking from the back as w
 
 ### Prompt 23
 
-I noticed that if the street bends and i do not touch controls the bicycle goes along with the direction of the street this should not happen.
+I noticed that if the street bends and i do not touch controls the bicycle goes along with the direction of the street this should not happen. also when player collides reduce speed to 0
+
+
 
