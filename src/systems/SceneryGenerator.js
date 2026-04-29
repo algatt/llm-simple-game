@@ -10,6 +10,7 @@ export class SceneryGenerator {
     this.sideOffset = options.sideOffset ?? 82;
     this.treeSideOffset = options.treeSideOffset ?? this.sideOffset + 70;
     this.houseDistance = options.houseDistance ?? 900;
+    this.difficulty = 0;
     this.items = [];
     this.nextHouseDistance = 120;
     this.nextTreeDistance = 80;
@@ -105,12 +106,39 @@ export class SceneryGenerator {
       .filter((item) => item.container.visible && !item.hasCollided)
       .map((item) => ({
         item,
-        bounds: item.container.getBounds()
+        bounds: this.getFairCollisionBounds(item)
       }));
   }
 
   markCollided(item) {
     item.hasCollided = true;
+  }
+
+  getFairCollisionBounds(item) {
+    const bounds = item.container.getBounds();
+    const shrinkX = item.type === 'tree' ? 0.58 : 0.68;
+    const shrinkY = item.type === 'tree' ? 0.7 : 0.76;
+    const width = bounds.width * shrinkX;
+    const height = bounds.height * shrinkY;
+
+    return new Phaser.Geom.Rectangle(
+      bounds.centerX - width / 2,
+      bounds.bottom - height,
+      width,
+      height
+    );
+  }
+
+  setDifficulty(difficulty) {
+    this.difficulty = Phaser.Math.Clamp(difficulty, 0, 1);
+    this.interval = {
+      min: Math.round(260 - 70 * this.difficulty),
+      max: Math.round(520 - 120 * this.difficulty)
+    };
+    this.treeInterval = {
+      min: Math.round(110 - 35 * this.difficulty),
+      max: Math.round(260 - 70 * this.difficulty)
+    };
   }
 
   createHouseOptions() {

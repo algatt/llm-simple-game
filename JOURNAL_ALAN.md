@@ -90,4 +90,16 @@ upto this stage what would you to make the game nicer?
 Implement them all at once
 
 
+### Prompt 25
+
+anything else?
+...
+ok add them all
+
+
+### Prompt 26 (EXTRA)
+
+can you get some music from public urls and use them instead?
+
+
 

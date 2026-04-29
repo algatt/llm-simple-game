@@ -195,3 +195,33 @@
 - Tuned scenery depth so close roadside objects can pass in front of the player while distant objects stay behind.
 - Added restart support on game over with `R`.
 - Game over now stores and displays best score using local storage when available.
+
+### Progress Update: Clarity, Difficulty, and Sound
+- Added dirt shoulder strips along both sides of the road so road boundaries are easier to read.
+- Added smaller, fairer collision boxes for scenery instead of using full visual bounds.
+- Added `DifficultySystem`, which ramps road sharpness and scenery density as points increase.
+- Added milestone messages and sound cues at difficulty milestones.
+- Added `P` pause/resume with an overlay.
+- Added generated Web Audio sounds for rolling, off-road texture, crash, milestones, and game over without requiring external audio files.
+
+### Progress Update: Sound Revision
+- Removed the continuous rolling/off-road oscillator because it sounded too much like a drone.
+- Kept sound as short event cues only: crash, milestone, and game over.
+
+### Progress Update: Public URL Music
+- Added looping background music from a public CC0 OpenGameArt URL.
+- Music starts after the first keypress/click to respect browser autoplay rules.
+- Music pauses by dropping volume to zero during pause/game-over while event cues remain separate.
+- Source: `https://opengameart.org/content/loop-music`
+- File URL: `https://opengameart.org/sites/default/files/1_13.mp3`
+
+### Progress Update: Music CORS Fix
+- Removed the explicit `crossOrigin` flag from public URL music playback.
+- The game now uses plain media playback for the remote MP3 instead of requesting CORS-enabled access.
+
+### Progress Update: Longer Music and Mute
+- Replaced the short music loop with a longer CC0 OpenGameArt track: `Cozy Puzzle In-Game 1`.
+- New music URL: `https://opengameart.org/sites/default/files/cozy_puzzle_in-game_1_bpm118.mp3`
+- Source page: `https://opengameart.org/content/cozy-puzzle-in-game-1`
+- Added `MusicToggleElement`, an on-screen `MUSIC: ON/OFF` button.
+- The music button mutes/unmutes only background music; event cues remain available.

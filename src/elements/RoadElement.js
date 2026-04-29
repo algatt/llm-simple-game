@@ -8,7 +8,9 @@ export class RoadElement {
     this.color = options.color ?? 0x4f4f4f;
     this.farColor = options.farColor ?? 0x70787f;
     this.edgeColor = options.edgeColor ?? 0xe8e1cf;
+    this.shoulderColor = options.shoulderColor ?? 0xb78b54;
     this.centerLineColor = options.centerLineColor ?? 0xf6d365;
+    this.shoulderWidth = options.shoulderWidth ?? 24;
     this.farAlpha = options.farAlpha ?? 0.52;
     this.nearAlpha = options.nearAlpha ?? 1;
     this.dashLength = options.dashLength ?? 34;
@@ -112,6 +114,7 @@ export class RoadElement {
     const roadPoints = this.createRoadPoints(this.bounds);
 
     this.graphics.clear();
+    this.drawShoulders(roadPoints);
     this.drawRoadSurface(roadPoints);
     this.drawEdge(roadPoints.leftEdge);
     this.drawEdge(roadPoints.rightEdge);
@@ -160,6 +163,32 @@ export class RoadElement {
 
       this.graphics.fillStyle(this.colorForProgress(progress), 1);
       this.graphics.fillPoints([nearLeft, nearRight, farRight, farLeft], true);
+    }
+  }
+
+  drawShoulders(roadPoints) {
+    for (let index = 0; index < roadPoints.leftEdge.length - 1; index += 1) {
+      const nearLeft = roadPoints.leftEdge[index];
+      const farLeft = roadPoints.leftEdge[index + 1];
+      const nearRight = roadPoints.rightEdge[index];
+      const farRight = roadPoints.rightEdge[index + 1];
+      const progress = (nearLeft.progress + farLeft.progress) / 2;
+      const shoulderWidth = this.shoulderWidth * (1 - progress * 0.55);
+      const alpha = 1 - progress * 0.25;
+
+      this.graphics.fillStyle(this.shoulderColor, alpha);
+      this.graphics.fillPoints([
+        { x: nearLeft.x - shoulderWidth, y: nearLeft.y },
+        nearLeft,
+        farLeft,
+        { x: farLeft.x - shoulderWidth, y: farLeft.y }
+      ], true);
+      this.graphics.fillPoints([
+        nearRight,
+        { x: nearRight.x + shoulderWidth, y: nearRight.y },
+        { x: farRight.x + shoulderWidth, y: farRight.y },
+        farRight
+      ], true);
     }
   }
 

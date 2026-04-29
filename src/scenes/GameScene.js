@@ -2,16 +2,21 @@ import Phaser from "phaser";
 import { FeedbackOverlayElement } from "../elements/FeedbackOverlayElement.js";
 import { GameOverElement } from "../elements/GameOverElement.js";
 import { HealthHudElement } from "../elements/HealthHudElement.js";
+import { MilestoneHudElement } from "../elements/MilestoneHudElement.js";
+import { MusicToggleElement } from "../elements/MusicToggleElement.js";
+import { PauseOverlayElement } from "../elements/PauseOverlayElement.js";
 import { PlayerElement } from "../elements/PlayerElement.js";
 import { RoadElement } from "../elements/RoadElement.js";
 import { ScoreHudElement } from "../elements/ScoreHudElement.js";
 import { SkyElement } from "../elements/SkyElement.js";
 import { SpeedHudElement } from "../elements/SpeedHudElement.js";
 import { TerrainElement } from "../elements/TerrainElement.js";
+import { DifficultySystem } from "../systems/DifficultySystem.js";
 import { HealthSystem } from "../systems/HealthSystem.js";
 import { RoadGenerator } from "../systems/RoadGenerator.js";
 import { ScoreSystem } from "../systems/ScoreSystem.js";
 import { SceneryGenerator } from "../systems/SceneryGenerator.js";
+import { SoundSystem } from "../systems/SoundSystem.js";
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -21,12 +26,20 @@ export class GameScene extends Phaser.Scene {
     this.speedHud = null;
     this.scoreHud = null;
     this.healthHud = null;
+    this.milestoneHud = null;
+    this.musicToggle = null;
+    this.pauseOverlay = null;
     this.healthSystem = new HealthSystem();
     this.scoreSystem = new ScoreSystem();
+    this.difficultySystem = new DifficultySystem();
+    this.soundSystem = new SoundSystem();
     this.feedbackOverlay = null;
     this.gameOverElement = null;
     this.isGameOver = false;
+    this.isPaused = false;
     this.restartKey = null;
+    this.pauseKey = null;
+    this.roadGenerator = null;
     this.terrain = null;
   }
 
@@ -36,8 +49,13 @@ export class GameScene extends Phaser.Scene {
 
     this.healthSystem = new HealthSystem();
     this.scoreSystem = new ScoreSystem();
+    this.difficultySystem = new DifficultySystem();
+    this.soundSystem = new SoundSystem();
     this.isGameOver = false;
+    this.isPaused = false;
     this.restartKey = this.input.keyboard.addKey("R");
+    this.pauseKey = this.input.keyboard.addKey("P");
+    this.soundSystem.create(this);
 
     const sky = new SkyElement();
     sky.create(this, {
@@ -54,6 +72,7 @@ export class GameScene extends Phaser.Scene {
       turnAmount: { min: 150, max: 235 },
       straightJitter: 8,
     });
+    this.roadGenerator = roadGenerator;
     const road = new RoadElement({
       generator: roadGenerator,
       curveStrength: 1.8,
@@ -113,6 +132,26 @@ export class GameScene extends Phaser.Scene {
     });
     this.healthHud.update(this.healthSystem.getHealth());
 
+    this.musicToggle = new MusicToggleElement();
+    this.musicToggle.create(this, {
+      x: 0,
+      y: 0,
+      width,
+      height: horizonY,
+    }, this.soundSystem);
+
+    this.milestoneHud = new MilestoneHudElement();
+    this.milestoneHud.create(this, {
+      width,
+      height,
+    });
+
+    this.pauseOverlay = new PauseOverlayElement();
+    this.pauseOverlay.create(this, {
+      width,
+      height,
+    });
+
     this.feedbackOverlay = new FeedbackOverlayElement();
     this.feedbackOverlay.create(this, {
       width,
@@ -131,6 +170,15 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
+    if (Phaser.Input.Keyboard.JustDown(this.pauseKey)) {
+      this.togglePause();
+    }
+
+    if (this.isPaused) {
+      this.soundSystem.update(0, false, true);
+      return;
+    }
+
     this.player?.update(delta);
     const isOffRoad = this.isPlayerOffRoad();
 
@@ -141,17 +189,40 @@ export class GameScene extends Phaser.Scene {
     const speed = this.player?.getSpeed() ?? 0;
 
     this.scoreSystem.update(delta, speed);
+    this.updateDifficulty();
     this.worldElements.forEach((element) => {
       element.update?.(delta, speed);
     });
     this.speedHud?.update(speed);
     this.scoreHud?.update(this.scoreSystem.getScore());
+    this.musicToggle?.update();
     this.checkSceneryCollisions(speed);
     this.healthHud?.update(this.healthSystem.getHealth());
+    this.milestoneHud?.update();
     this.feedbackOverlay?.update(isOffRoad, speed);
+    this.soundSystem.update(speed, isOffRoad, false);
 
     if (this.healthSystem.isDepleted()) {
       this.endGame();
+    }
+  }
+
+  togglePause() {
+    this.isPaused = !this.isPaused;
+    this.pauseOverlay?.setPaused(this.isPaused);
+  }
+
+  updateDifficulty() {
+    const score = this.scoreSystem.getScore();
+    const didLevelUp = this.difficultySystem.update(score);
+    const difficulty = this.difficultySystem.getDifficulty();
+
+    this.roadGenerator?.setDifficulty(difficulty);
+    this.terrain?.getScenery()?.setDifficulty(difficulty);
+
+    if (didLevelUp && score > 0) {
+      this.milestoneHud?.show(`MILESTONE ${score}`);
+      this.soundSystem.playMilestone();
     }
   }
 
@@ -192,6 +263,7 @@ export class GameScene extends Phaser.Scene {
       this.player?.wobble();
       this.healthHud?.pulse();
       this.feedbackOverlay?.crashFlash();
+      this.soundSystem.playCrash();
       this.cameras.main.shake(170, 0.012);
       scenery.markCollided(item);
     });
@@ -202,6 +274,8 @@ export class GameScene extends Phaser.Scene {
     const score = this.scoreSystem.getScore();
     const bestScore = this.saveBestScore(score);
 
+    this.soundSystem.update(0, false, true);
+    this.soundSystem.playGameOver();
     this.gameOverElement = new GameOverElement();
     this.gameOverElement.create(this, {
       width: this.scale.width,
@@ -234,11 +308,20 @@ export class GameScene extends Phaser.Scene {
     this.scoreHud = null;
     this.healthHud?.destroy();
     this.healthHud = null;
+    this.milestoneHud?.destroy();
+    this.milestoneHud = null;
+    this.musicToggle?.destroy();
+    this.musicToggle = null;
+    this.pauseOverlay?.destroy();
+    this.pauseOverlay = null;
     this.feedbackOverlay?.destroy();
     this.feedbackOverlay = null;
+    this.soundSystem?.destroy();
     this.gameOverElement?.destroy();
     this.gameOverElement = null;
     this.restartKey = null;
+    this.pauseKey = null;
+    this.roadGenerator = null;
     this.terrain = null;
   }
 }

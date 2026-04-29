@@ -9,6 +9,7 @@ export class RoadGenerator {
     this.turnAmount = options.turnAmount ?? { min: 150, max: 235 };
     this.straightJitter = options.straightJitter ?? 8;
     this.nextSection = 'straight';
+    this.difficulty = 0;
     this.anchors = [
       { distance: 0, offset: 0 },
       { distance: 900, offset: 0 }
@@ -85,6 +86,24 @@ export class RoadGenerator {
 
   randomBetween(range) {
     return Phaser.Math.Between(range.min, range.max);
+  }
+
+  setDifficulty(difficulty) {
+    this.difficulty = Phaser.Math.Clamp(difficulty, 0, 1);
+    this.maxOffset = 210 + 85 * this.difficulty;
+    this.straightLength = {
+      min: Math.round(950 - 260 * this.difficulty),
+      max: Math.round(1450 - 360 * this.difficulty)
+    };
+    this.turnLength = {
+      min: Math.round(260 - 70 * this.difficulty),
+      max: Math.round(380 - 80 * this.difficulty)
+    };
+    this.turnAmount = {
+      min: Math.round(150 + 60 * this.difficulty),
+      max: Math.round(235 + 80 * this.difficulty)
+    };
+    this.straightJitter = Math.round(8 + 10 * this.difficulty);
   }
 
   smoothStep(progress) {
