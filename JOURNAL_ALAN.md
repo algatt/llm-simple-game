@@ -43,3 +43,19 @@ Ok some refinements, can you make the yellow line in the middle dashed, and can 
 ### Prompt 12
 
 alpha on the road does not work well i can see the grass underneath
+
+### Prompt 13
+
+ok now let's start adding some scenery. create a house module that genereates a house. in order to have some variety, set some paramterised values like height, windows, type, etc... then use a random generator to place houses at random intervals on the left and right sections of the road.
+
+### Prompt 14
+don't make houses transparent they don't look nice. Also we need the houses to be bigger since right now they are the size of the player. We need to add some logic that the further away they are the smaller they look and they increase in size the closer they get. the house with the triangular roof; the roof is offset.
+
+
+### Prompt 15
+triangular roof is still not on top of rectangle.
+
+### Prompt 16
+
+nice. push the houses a bit away from the road
+

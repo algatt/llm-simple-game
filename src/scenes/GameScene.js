@@ -5,6 +5,7 @@ import { SkyElement } from "../elements/SkyElement.js";
 import { SpeedHudElement } from "../elements/SpeedHudElement.js";
 import { TerrainElement } from "../elements/TerrainElement.js";
 import { RoadGenerator } from "../systems/RoadGenerator.js";
+import { SceneryGenerator } from "../systems/SceneryGenerator.js";
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -40,7 +41,13 @@ export class GameScene extends Phaser.Scene {
       segments: 32,
       worldSpeedMultiplier: 42,
     });
-    const terrain = new TerrainElement({ road });
+    const scenery = new SceneryGenerator({
+      road,
+      interval: { min: 260, max: 520 },
+      sideOffset: 145,
+      houseDistance: 980,
+    });
+    const terrain = new TerrainElement({ road, scenery });
     terrain.create(this, {
       x: 0,
       y: horizonY,

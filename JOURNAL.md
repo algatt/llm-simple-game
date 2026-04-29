@@ -123,3 +123,22 @@
 - Removed transparency from the asphalt surface because it exposed the terrain underneath.
 - Kept the distance effect by blending road color toward a lighter far-road color instead.
 - Retained fading on markings and edge lines, where transparency reads better visually.
+
+### Progress Update: House Scenery
+- Added `HouseElement`, a parameterized house module with width, height, type, color, roof color, and window count.
+- Added `SceneryGenerator`, which spawns houses at random intervals on the left and right sides of the road.
+- Exposed road distance and distance sampling from `RoadElement` so scenery can stay aligned with the generated road.
+- Houses scale, fade, and reposition according to perspective as they move toward the player.
+
+### Progress Update: House Perspective Refinement
+- Houses now stay fully opaque; distance is communicated by scale instead of transparency.
+- Increased house base dimensions so nearby houses read as scenery, not player-sized props.
+- Strengthened perspective scaling so distant houses start small and grow as they approach.
+- Fixed triangular roof alignment by drawing it around a centered local origin.
+
+### Progress Update: Roof Alignment Fix
+- Replaced Phaser triangle roof positioning with an explicit graphics polygon.
+- The triangular roof base now sits directly on the house rectangle's top edge in local house coordinates.
+
+### Progress Update: House Placement Tuning
+- Increased scenery side offset so houses sit farther away from the road.

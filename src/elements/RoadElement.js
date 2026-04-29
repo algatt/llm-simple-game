@@ -37,6 +37,39 @@ export class RoadElement {
     this.draw();
   }
 
+  getDistance() {
+    return this.distance;
+  }
+
+  getSampleAtDistance(distance) {
+    if (!this.bounds) {
+      return null;
+    }
+
+    const relativeDistance = distance - this.distance;
+
+    if (relativeDistance < 0 || relativeDistance > this.lookAhead) {
+      return null;
+    }
+
+    const progress = (relativeDistance / this.lookAhead) ** (1 / this.curveStrength);
+    const perspective = 1 - progress ** 1.45;
+    const bottomCenterX = this.bounds.x + this.bounds.width / 2;
+    const bottomY = this.bounds.y + this.bounds.height;
+    const baseOffset = this.generator.getOffset(this.distance);
+    const centerX = bottomCenterX + this.generator.getOffset(distance) - baseOffset;
+    const y = bottomY - this.bounds.height * progress;
+    const width = this.topWidth + (this.bottomWidth - this.topWidth) * perspective;
+
+    return {
+      centerX,
+      y,
+      width,
+      progress,
+      scale: 0.12 + 0.88 * perspective
+    };
+  }
+
   draw() {
     if (!this.graphics || !this.bounds) {
       return;

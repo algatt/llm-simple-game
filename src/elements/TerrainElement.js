@@ -1,8 +1,10 @@
 import { RoadElement } from './RoadElement.js';
+import { SceneryGenerator } from '../systems/SceneryGenerator.js';
 
 export class TerrainElement {
   constructor(options = {}) {
     this.road = options.road ?? new RoadElement();
+    this.scenery = options.scenery ?? new SceneryGenerator({ road: this.road });
     this.objects = [];
   }
 
@@ -27,11 +29,13 @@ export class TerrainElement {
     ).setOrigin(0, 0);
 
     this.road.create(scene, bounds);
-    this.objects = [ground, horizon, grassLine, this.road];
+    this.scenery.create(scene, bounds);
+    this.objects = [ground, horizon, grassLine, this.scenery, this.road];
   }
 
   update(delta, speed) {
     this.road.update(delta, speed);
+    this.scenery.update(delta, speed);
   }
 
   destroy() {
