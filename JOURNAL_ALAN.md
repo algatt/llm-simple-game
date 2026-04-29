@@ -15,3 +15,9 @@ ok it worked, i have run the server on 5173 and i can see phaser setup. ok now i
 There is no need to run build everytime, i will check manually.
 
 ### Prompt 5
+
+ok so the intention is now to have the player ride a bicycle on a road that never actually ends, but it can swerve to the left or to the right. so for now i want you to create a road element that is placed in the middle of the terrain; but it must be parametrised so that it can curve to the left or to the right by an x amount.
+
+### Prompt 6
+
+I want the curve to be worked out differently, right now when i set curveX the road simply shifts diagonally, i want it to actually curve.

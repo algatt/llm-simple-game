@@ -1,10 +1,11 @@
-import Phaser from 'phaser';
-import { SkyElement } from '../elements/SkyElement.js';
-import { TerrainElement } from '../elements/TerrainElement.js';
+import Phaser from "phaser";
+import { RoadElement } from "../elements/RoadElement.js";
+import { SkyElement } from "../elements/SkyElement.js";
+import { TerrainElement } from "../elements/TerrainElement.js";
 
 export class GameScene extends Phaser.Scene {
   constructor() {
-    super('GameScene');
+    super("GameScene");
     this.worldElements = [];
   }
 
@@ -17,15 +18,20 @@ export class GameScene extends Phaser.Scene {
       x: 0,
       y: 0,
       width,
-      height: horizonY
+      height: horizonY,
     });
 
-    const terrain = new TerrainElement();
+    const road = new RoadElement({
+      curveX: 140,
+      curveStrength: 1.7,
+      segments: 28,
+    });
+    const terrain = new TerrainElement({ road });
     terrain.create(this, {
       x: 0,
       y: horizonY,
       width,
-      height: height - horizonY
+      height: height - horizonY,
     });
 
     this.worldElements = [sky, terrain];

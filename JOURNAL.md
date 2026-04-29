@@ -66,3 +66,14 @@
 
 ### Preference
 - Keep visual world pieces as replaceable modules. A scene should decide which elements exist, while each element owns how it draws and cleans itself up.
+
+### Progress Update: Road Element
+- Added `RoadElement` as a separate terrain child module.
+- The road is drawn in the middle of the terrain and can be parameterized with `curveX`.
+- `curveX` shifts the far/horizon end of the road left or right while the near/bottom end stays centered, giving us the beginning of a swerving road model.
+- `TerrainElement` now accepts a road instance, so the road can be swapped or configured without changing terrain drawing logic.
+
+### Progress Update: Curved Road
+- Reworked `RoadElement` so `curveX` creates an actual bend instead of a diagonal road.
+- The road is now generated from multiple sampled points: its centerline eases toward the configured curve amount while the road narrows toward the horizon.
+- Added `segments` and `curveStrength` parameters so future tuning can control road smoothness and bend shape.
