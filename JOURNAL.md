@@ -225,3 +225,8 @@
 - Source page: `https://opengameart.org/content/cozy-puzzle-in-game-1`
 - Added `MusicToggleElement`, an on-screen `MUSIC: ON/OFF` button.
 - The music button mutes/unmutes only background music; event cues remain available.
+
+### Progress Update: GitHub Pages Setup
+- Added `src/vite.config.js` with base path `/llm-simple-game/`.
+- Added `.github/workflows/deploy.yml` to build the Vite app from `src` and deploy `src/dist` to GitHub Pages.
+- Updated `README.md` with GitHub Pages setup instructions.

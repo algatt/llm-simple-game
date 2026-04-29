@@ -27,6 +27,36 @@ Then open the URL Vite prints in the terminal. By default it is usually:
 http://127.0.0.1:5173
 ```
 
+## Deploy To GitHub Pages
+
+This repository is configured for GitHub Pages under the repo name `llm-simple-game`.
+
+The Vite base path is set in:
+
+```text
+src/vite.config.js
+```
+
+The GitHub Pages workflow is:
+
+```text
+.github/workflows/deploy.yml
+```
+
+To publish:
+
+1. Push changes to the `main` branch.
+2. In GitHub, open the repository settings.
+3. Go to **Pages**.
+4. Set **Build and deployment** source to **GitHub Actions**.
+5. Wait for the `Deploy to GitHub Pages` workflow to finish.
+
+The site should then be available at:
+
+```text
+https://<your-github-username>.github.io/llm-simple-game/
+```
+
 ## Controls
 
 - `A`: steer left
