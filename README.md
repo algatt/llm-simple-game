@@ -54,7 +54,7 @@ To publish:
 The site should then be available at:
 
 ```text
-https://<your-github-username>.github.io/llm-simple-game/
+https://<github-username>.github.io/llm-simple-game/
 ```
 
 ## Controls

@@ -54,7 +54,7 @@ ok much better. now let's start planning the player before we continue to work o
 
 Added `PlayerElement` as a modular player component. Created a placeholder cube and wired `A`/`D` movement into the player while keeping movement logic out of `GameScene`.
 
-### Prompt 8
+### Prompt 8 
 
 ok, now let's add the player speed. add an indicator on the top of the screen with speed. when 'w' is pressed speed increases, and when 's' is pressed speed decreases. make sure not to go beyond limits. when speed increases / decreeases i want the road the user to move on the road. so we must create a roadgenerator module, that generates the road in a random manner, but obviously making sure that the road is continuous and behaves in a natural way.
 
