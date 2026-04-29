@@ -1,3 +1,4 @@
+import Phaser from 'phaser';
 import { RoadGenerator } from '../systems/RoadGenerator.js';
 
 export class RoadElement {
@@ -5,8 +6,13 @@ export class RoadElement {
     this.topWidth = options.topWidth ?? 78;
     this.bottomWidth = options.bottomWidth ?? 310;
     this.color = options.color ?? 0x4f4f4f;
+    this.farColor = options.farColor ?? 0x70787f;
     this.edgeColor = options.edgeColor ?? 0xe8e1cf;
     this.centerLineColor = options.centerLineColor ?? 0xf6d365;
+    this.farAlpha = options.farAlpha ?? 0.52;
+    this.nearAlpha = options.nearAlpha ?? 1;
+    this.dashLength = options.dashLength ?? 34;
+    this.dashGap = options.dashGap ?? 28;
     this.segments = options.segments ?? 28;
     this.curveStrength = options.curveStrength ?? 2.25;
     this.lookAhead = options.lookAhead ?? 520;
@@ -39,11 +45,10 @@ export class RoadElement {
     const roadPoints = this.createRoadPoints(this.bounds);
 
     this.graphics.clear();
-    this.graphics.fillStyle(this.color, 1);
-    this.graphics.fillPoints(roadPoints.polygon, true);
-    this.drawPolyline(roadPoints.leftEdge, 7, this.edgeColor);
-    this.drawPolyline(roadPoints.rightEdge, 7, this.edgeColor);
-    this.drawPolyline(roadPoints.centerLine, 5, this.centerLineColor);
+    this.drawRoadSurface(roadPoints);
+    this.drawEdge(roadPoints.leftEdge);
+    this.drawEdge(roadPoints.rightEdge);
+    this.drawDashedCenterLine(roadPoints.centerLine);
   }
 
   createRoadPoints(bounds) {
@@ -56,15 +61,15 @@ export class RoadElement {
 
     for (let index = 0; index <= this.segments; index += 1) {
       const progress = index / this.segments;
-      const horizonProgress = 1 - progress;
+      const perspective = 1 - progress ** 1.45;
       const y = bottomY - bounds.height * progress;
       const roadDistance = this.distance + this.lookAhead * this.easeCurve(progress);
       const centerX = bottomCenterX + this.generator.getOffset(roadDistance) - baseOffset;
-      const width = this.topWidth + (this.bottomWidth - this.topWidth) * horizonProgress;
+      const width = this.topWidth + (this.bottomWidth - this.topWidth) * perspective;
 
-      leftEdge.push({ x: centerX - width / 2, y });
-      rightEdge.push({ x: centerX + width / 2, y });
-      centerLine.push({ x: centerX, y });
+      leftEdge.push({ x: centerX - width / 2, y, progress });
+      rightEdge.push({ x: centerX + width / 2, y, progress });
+      centerLine.push({ x: centerX, y, progress });
     }
 
     return {
@@ -79,16 +84,68 @@ export class RoadElement {
     return progress ** this.curveStrength;
   }
 
-  drawPolyline(points, width, color) {
-    this.graphics.lineStyle(width, color, 1);
+  drawRoadSurface(roadPoints) {
+    for (let index = 0; index < roadPoints.leftEdge.length - 1; index += 1) {
+      const nearLeft = roadPoints.leftEdge[index];
+      const farLeft = roadPoints.leftEdge[index + 1];
+      const nearRight = roadPoints.rightEdge[index];
+      const farRight = roadPoints.rightEdge[index + 1];
+      const progress = (nearLeft.progress + farLeft.progress) / 2;
+
+      this.graphics.fillStyle(this.colorForProgress(progress), 1);
+      this.graphics.fillPoints([nearLeft, nearRight, farRight, farLeft], true);
+    }
+  }
+
+  drawEdge(points) {
+    for (let index = 0; index < points.length - 1; index += 1) {
+      const start = points[index];
+      const end = points[index + 1];
+      const progress = (start.progress + end.progress) / 2;
+      const width = 7 - 3 * progress;
+
+      this.drawLine(start, end, width, this.edgeColor, this.alphaForProgress(progress));
+    }
+  }
+
+  drawDashedCenterLine(points) {
+    let dashCursor = (this.distance * 0.55) % (this.dashLength + this.dashGap);
+
+    for (let index = 0; index < points.length - 1; index += 1) {
+      const start = points[index];
+      const end = points[index + 1];
+      const segmentLength = Math.hypot(end.x - start.x, end.y - start.y);
+      const progress = (start.progress + end.progress) / 2;
+
+      if (dashCursor < this.dashLength) {
+        const width = 5 - 2.8 * progress;
+
+        this.drawLine(start, end, width, this.centerLineColor, this.alphaForProgress(progress));
+      }
+
+      dashCursor = (dashCursor + segmentLength) % (this.dashLength + this.dashGap);
+    }
+  }
+
+  drawLine(start, end, width, color, alpha) {
+    this.graphics.lineStyle(width, color, alpha);
     this.graphics.beginPath();
-    this.graphics.moveTo(points[0].x, points[0].y);
-
-    points.slice(1).forEach((point) => {
-      this.graphics.lineTo(point.x, point.y);
-    });
-
+    this.graphics.moveTo(start.x, start.y);
+    this.graphics.lineTo(end.x, end.y);
     this.graphics.strokePath();
+  }
+
+  alphaForProgress(progress) {
+    return this.nearAlpha + (this.farAlpha - this.nearAlpha) * progress;
+  }
+
+  colorForProgress(progress) {
+    return Phaser.Display.Color.Interpolate.ColorWithColor(
+      Phaser.Display.Color.ValueToColor(this.color),
+      Phaser.Display.Color.ValueToColor(this.farColor),
+      1,
+      progress
+    ).color;
   }
 
   destroy() {

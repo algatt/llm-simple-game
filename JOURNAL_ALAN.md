@@ -35,3 +35,11 @@ Looking good, but the road behaves unnaturally it is twisting too much we need a
 ### Prompt 10
 
 Ok i need longer straights, and more sharp turns when they happen. This contributes to the game since later on if the user will go off road we will deduct health.
+
+### Prompt 11
+
+Ok some refinements, can you make the yellow line in the middle dashed, and can you add better perspective and a bit of fading the farther away the road is
+
+### Prompt 12
+
+alpha on the road does not work well i can see the grass underneath

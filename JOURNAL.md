@@ -112,3 +112,14 @@
 - Straights now hold almost the same offset for a long distance.
 - Turns now happen over a much shorter distance and move by a larger amount.
 - The generator alternates between long straight holds and short turn transitions, which should read more like actual roads than left/right drifting.
+
+### Progress Update: Road Perspective Polish
+- Changed the road center line from solid to dashed.
+- Road markings now scroll with road distance so speed is more visible.
+- Road surface and linework fade toward the horizon.
+- Adjusted road width interpolation to feel more perspective-like, with stronger narrowing farther away.
+
+### Progress Update: Road Fade Correction
+- Removed transparency from the asphalt surface because it exposed the terrain underneath.
+- Kept the distance effect by blending road color toward a lighter far-road color instead.
+- Retained fading on markings and edge lines, where transparency reads better visually.
