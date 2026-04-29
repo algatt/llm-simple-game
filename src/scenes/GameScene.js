@@ -44,7 +44,9 @@ export class GameScene extends Phaser.Scene {
     const scenery = new SceneryGenerator({
       road,
       interval: { min: 260, max: 520 },
+      treeInterval: { min: 110, max: 260 },
       sideOffset: 145,
+      treeSideOffset: 220,
       houseDistance: 980,
     });
     const terrain = new TerrainElement({ road, scenery });

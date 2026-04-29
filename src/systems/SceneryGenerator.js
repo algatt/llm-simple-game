@@ -1,14 +1,18 @@
 import Phaser from 'phaser';
 import { HouseElement } from '../elements/HouseElement.js';
+import { TreeElement } from '../elements/TreeElement.js';
 
 export class SceneryGenerator {
   constructor(options = {}) {
     this.road = options.road;
     this.interval = options.interval ?? { min: 260, max: 520 };
+    this.treeInterval = options.treeInterval ?? { min: 120, max: 280 };
     this.sideOffset = options.sideOffset ?? 82;
+    this.treeSideOffset = options.treeSideOffset ?? this.sideOffset + 70;
     this.houseDistance = options.houseDistance ?? 900;
     this.items = [];
-    this.nextSpawnDistance = 120;
+    this.nextHouseDistance = 120;
+    this.nextTreeDistance = 80;
   }
 
   create(scene, bounds) {
@@ -29,20 +33,28 @@ export class SceneryGenerator {
   spawnUntilAhead() {
     const targetDistance = this.road.getDistance() + this.houseDistance;
 
-    while (this.nextSpawnDistance < targetDistance) {
-      this.spawnHouse(this.nextSpawnDistance);
-      this.nextSpawnDistance += Phaser.Math.Between(this.interval.min, this.interval.max);
+    while (this.nextHouseDistance < targetDistance) {
+      this.spawnItem('house', this.nextHouseDistance);
+      this.nextHouseDistance += Phaser.Math.Between(this.interval.min, this.interval.max);
+    }
+
+    while (this.nextTreeDistance < targetDistance) {
+      this.spawnItem('tree', this.nextTreeDistance);
+      this.nextTreeDistance += Phaser.Math.Between(this.treeInterval.min, this.treeInterval.max);
     }
   }
 
-  spawnHouse(distance) {
-    const house = new HouseElement(this.createHouseOptions());
+  spawnItem(type, distance) {
+    const element = type === 'tree'
+      ? new TreeElement(this.createTreeOptions())
+      : new HouseElement(this.createHouseOptions());
     const side = Math.random() < 0.5 ? 'left' : 'right';
     const item = {
-      house,
+      element,
+      type,
       side,
       distance,
-      container: house.create(this.scene, 0, 0, 1)
+      container: element.create(this.scene, 0, 0, 1)
     };
 
     this.items.push(item);
@@ -58,9 +70,12 @@ export class SceneryGenerator {
     }
 
     const sideMultiplier = item.side === 'left' ? -1 : 1;
-    const x = sample.centerX + sideMultiplier * (sample.width / 2 + this.sideOffset * sample.scale);
+    const offset = item.type === 'tree' ? this.treeSideOffset : this.sideOffset;
+    const x = sample.centerX + sideMultiplier * (sample.width / 2 + offset * sample.scale);
     const y = sample.y;
-    const scale = 0.18 + 1.25 * sample.scale;
+    const scale = item.type === 'tree'
+      ? 0.16 + 1.45 * sample.scale
+      : 0.18 + 1.25 * sample.scale;
 
     item.container.setVisible(true);
     item.container.setPosition(x, y);
@@ -75,7 +90,7 @@ export class SceneryGenerator {
 
     this.items.forEach((item) => {
       if (item.distance < minimumDistance) {
-        item.house.destroy();
+        item.element.destroy();
         return;
       }
 
@@ -100,8 +115,21 @@ export class SceneryGenerator {
     };
   }
 
+  createTreeOptions() {
+    const types = ['round', 'pine'];
+    const leafColors = [0x2f7d32, 0x3f8f3c, 0x246b2f, 0x4f9d46];
+
+    return {
+      height: Phaser.Math.Between(88, 142),
+      trunkWidth: Phaser.Math.Between(12, 22),
+      canopySize: Phaser.Math.Between(52, 82),
+      type: types[Phaser.Math.Between(0, types.length - 1)],
+      leafColor: leafColors[Phaser.Math.Between(0, leafColors.length - 1)]
+    };
+  }
+
   destroy() {
-    this.items.forEach((item) => item.house.destroy());
+    this.items.forEach((item) => item.element.destroy());
     this.items = [];
     this.scene = null;
     this.bounds = null;

@@ -59,3 +59,7 @@ triangular roof is still not on top of rectangle.
 
 nice. push the houses a bit away from the road
 
+### Prompt 17
+
+ok now i want the same sort of generator but for trees this time
+

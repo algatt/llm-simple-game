@@ -142,3 +142,9 @@
 
 ### Progress Update: House Placement Tuning
 - Increased scenery side offset so houses sit farther away from the road.
+
+### Progress Update: Tree Scenery
+- Added `TreeElement`, a parameterized tree module with height, trunk width, canopy size, canopy type, and colors.
+- Extended `SceneryGenerator` so it can spawn both houses and trees.
+- Trees have their own random interval and side offset, making them more frequent and usually farther from the road than houses.
+- Trees use the same road perspective sampling as houses, so they scale and move consistently with the endless road.
